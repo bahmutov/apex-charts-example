@@ -1,7 +1,8 @@
 {
   "name": "apex-charts-example",
   "version": "1.0.0",
-  "description": "",
+  "description": "Playing with Apex React charts",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
