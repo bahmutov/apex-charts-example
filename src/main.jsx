@@ -1,6 +1,34 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ReactApexChart from 'react-apexcharts'
+import lessons from './lessons.json'
+import completed from './completed.json'
+
+const lessonCounts = lessons.map((utc, k) => {
+  const x = new Date(utc).getTime()
+  return {
+    x,
+    y: k + 1,
+  }
+})
+
+const completedCounts = completed
+  .filter((lesson) => lesson.complete)
+  .map((lesson) => lesson.completedAt)
+  .map((timestamp) => new Date(timestamp).getTime())
+  .sort()
+  .map((x, k) => {
+    return {
+      x,
+      y: k + 1,
+    }
+  })
+// make sure the completed lessons line goes all the way to the end
+// of the last lesson timestamp
+completedCounts.push({
+  x: lessonCounts.at(-1).x,
+  y: completedCounts.at(-1).y,
+})
 
 class ApexChart extends React.Component {
   constructor(props) {
@@ -9,8 +37,12 @@ class ApexChart extends React.Component {
     this.state = {
       series: [
         {
-          name: 'Desktops',
-          data: [10, 41, 35, 51, 49, 62, 69, 91, 148],
+          name: 'Total lessons',
+          data: lessonCounts,
+        },
+        {
+          name: 'Completed lessons',
+          data: completedCounts,
         },
       ],
       options: {
@@ -25,11 +57,17 @@ class ApexChart extends React.Component {
           enabled: false,
         },
         stroke: {
-          curve: 'straight',
+          curve: 'stepline',
+          width: 1,
         },
         title: {
           text: 'Course Completion',
           align: 'left',
+        },
+        markers: {
+          hover: {
+            sizeOffset: 4,
+          },
         },
         grid: {
           row: {
@@ -38,17 +76,11 @@ class ApexChart extends React.Component {
           },
         },
         xaxis: {
-          categories: [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-          ],
+          type: 'datetime',
+        },
+        yaxis: {
+          min: 0,
+          max: lessonCounts.length * 1.1,
         },
       },
     }
